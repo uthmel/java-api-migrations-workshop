@@ -223,6 +223,15 @@ DROP COLUMN publisher,
 DROP COLUMN publisher_location;
 ```
 
+**V3_2_0__add_foriegn_key_for_publishers_to_books.sql**
+
+```sql
+ALTER TABLE Books
+ADD COLUMN publisher_id int;
+
+ALTER TABLE Books
+ADD CONSTRAINT fk_publisher_id FOREIGN KEY (publisher_id) REFERENCES Publishers (id);
+```
 ## Activity
 
 Either change the location of the db migrations location in the config file, or move the existing migrations out of the **db/migrations** folder before starting this activity, and place the files to perform this migration in there.
