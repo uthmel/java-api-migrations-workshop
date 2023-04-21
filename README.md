@@ -68,12 +68,14 @@ Scroll down to the line that reads **flyway.locations=filesystem:sql*** and remo
 Uncomment the line that starts with: **flyway.url** by removing the **#**.
 
 Then after the **=** sign add the following:
-`
-flyway.url=jdbc:postgresql://<URL of the database>:5432/<Username/Database name>
-`
-Replace **<URL of the database>** with the **Hostname** details from ElephantSQL
 
-Replace **<Username/Database name>** with the one shown in ElephantSQL.
+`
+jdbc:postgresql://<URL of the database>:5432/<Username/Database name>
+`
+
+Replace `<URL of the database>` with the **Hostname** details from ElephantSQL
+
+Replace `<Username/Database name>` with the one shown in ElephantSQL.
 
 ![postgres-connection.png](assets/postgres-connection.png)
 
