@@ -51,9 +51,9 @@ In the previous session, you created a database and tables on ElephantSQL which 
 
 Flyway has various places it looks for a config file, which will hold the details of the database connection (in this order):
 
-- <install-dir>/conf/flyway.conf
-- <user-home>/flyway.conf
-- <current-dir>/flyway.conf
+- `<install-dir>/conf/flyway.conf`
+- `<user-home>/flyway.conf`
+- `<current-dir>/flyway.conf`
 
 If you put flyway.conf into your current directory it is very, very, very important that you **DO NOT** commit this to GitHub, as anyone with access to your repo could then use the credentials to access your Database. There are bots constantly scanning GitHub to steal these sorts of information in order to use them for potentially nefarious purposes.
 
