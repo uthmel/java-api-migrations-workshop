@@ -43,7 +43,7 @@ Running **flyway —version** should show the version of flyway you have just in
 
 ---
 
-In the previous session, you created a database and tables on Neon which you used Beeline Studio to connect to (using the connection details from Neon).
+In the previous session, you created a database and tables on Neon which you used Beekeeper Studio to connect to (using the connection details from Neon).
 
 Flyway has various places it looks for a config file, which will hold the details of the database connection (in this order):
 
@@ -88,37 +88,50 @@ password = "sample password"
 # buildEnvironment = "build"
 ```
 
-We need to make changes to the top part where it details, the connection details and then uncomment the part where the connection details are referenced.
+Now go to your Neon Dashboard and find the Connection Details, they should look something like this:
 
-Scroll down to the line that reads **flyway.locations=filesystem:sql*** and remove the part after the = sign. Change it so that it reads **flyway.locations=db/migrations** to make flyway read the current directory (where it is being run from) looking for a directory called **db** containing another one called **migrations** which will contain our database migration files.
+![Connection Details](assets/neon-details.png)
 
-Uncomment the line that starts with: **flyway.url** by removing the **#**.
+Take the values listed there and use them to populate your `flyway.toml` file as follows. Also change the name of the connection section from `sample` to something else relevant and uncomment the `environment` part adding the name of the connection sample as shown. It should look something like this (the connection details have already been changed in my Neon account):
 
-Then after the **=** sign add the following:
+```toml
+# More information on the parameters can be found here: https://documentation.red-gate.com/flyway/flyway-cli-and-api/configuration/parameters
 
-`
-jdbc:postgresql://<URL of the database>:5432/<Username/Database name>
-`
+[environments.neon]
+url = "jdbc:postgresql://ep-wandering-sea-a2z0gksg.eu-central-1.aws.neon.tech:5432/neondb"
+user = "neondb_owner"
+password = "FEZYhz5u7KTH"
+# jarDirs = ["path/to/java/migrations"]
+# driver =
+# schemas =
+# connectRetries =
+# connectRetriesInterval =
+# initSql =
+# jdbcProperties =
+# resolvers =
 
-Replace `<URL of the database>` with the **Hostname** details from ElephantSQL
+[flyway]
+environment = "neon" # It is recommended to configure environment as a commandline argument. This allows using different environments depending on the caller.
+locations = ["db/migrations"]
 
-Replace `<Username/Database name>` with the one shown in ElephantSQL.
+# [environments.build]
+# url = "jdbc:sqlite::memory:"
+# user = "buildUser"
+# password = "buildPassword"
 
-![postgres-connection.png](assets/postgres-connection.png)
+# [flyway.check]
+# buildEnvironment = "build"
+```
 
-Uncomment the line that starts **flyway.user** and add the Username/Database name after it.
-
-Uncomment the line that starts **flyway.password** and add the Password after it.
-
-Make sure to save the **flyway.conf** file.
-
-You can test your connection by typing:
+We've also added a location `db/migrations`, which flyway will check for migration files to use. The way it is set up, even though the config file is elsewhere, when we run the following command from the top level of our project (ie we run the command in the terminal in IntelliJ) flyway will look for a folder called `db` containing another folder called `migrations` and use that location. If you make sure you have that all set up and then run the following command:
 
 **flyway migrate**
 
-at the command line and hitting enter. If all is well you should see something that looks like:
+If all is well you should see something that looks like:
 
 ![first-migrate.png](assets/first-migrate.png)
+
+It may include an error or warning that the database isn't empty, but we'll fix that next.
 
 ### Using Flyway to Create and Update a Database
 
@@ -126,9 +139,9 @@ at the command line and hitting enter. If all is well you should see something t
 
 Think about the Book database you started with yesterday.
 
-First of all use TablePlus to go into the ElephantSQL database that was created yesterday and remove all of the tables using **drop table <name-of-table>** replacing <name-of-table> with the names of each table to remove.
+First of all use Beekeeper Studio to go into the Neon database that was created yesterday and remove all of the tables using **drop table <name-of-table>** replacing <name-of-table> with the names of each table to remove. You can then run `flyway migrate` again if you wish to check that everything is now cleared.
 
-Next we are going to create a Books database if we had it as a monolithic table it would look something like:
+Next we are going to create a Books database, if we had it as a single monolithic table, the structure would look something like:
 
 Books
 
@@ -140,19 +153,19 @@ The query we would use to do this looks like this:
 
 ```sql
 CREATE TABLE IF NOT EXISTS Books(
-	id serial primary key,
-	title varchar(255) not null,
-	author varchar(255),
-	publisher varchar(255),
-	year int,
-	genre varchar(255),
-	score int,
-	author_email varchar(255),
-	publisher_location varchar(255)
-)
+	id SERIAL PRIMARY KEY,
+	title TEXT NOT NULL,
+	author TEXT,
+	publisher TEXT,
+	year INT,
+	genre TEXT,
+	score INT,
+	author_email TEXT,
+	publisher_location TEXT
+);
 ```
 
-Rather than run it in TablePlus we are going to use flyway to iterate through creating and then changing (ie Migrating) the database until we get to a final version that matches what we want.
+Rather than run it in Beekeeper Studio we are going to use flyway to iterate through creating and then changing (ie Migrating) the database until we get to a final version that matches what we want.
 
 In the **db/migrations** folder in the repo create a new file called **V1_0_0__initial_table_creation.sql** and paste the above code to create the SQL table in it.
 
@@ -162,7 +175,7 @@ To run the file make sure you are in the top-level directory of the project in y
 
 ![table_creation.png](assets/table_creation.png)
 
-In TablePlus look at the tables in the database, there should be a **Books** one which matches the one defined in our file.
+In Beekeeper Studio look at the tables in the database, there should be a **Books** one which matches the one defined in our file. There will also be a second table called something like `flyway_schema_history` which is part of the way that flyway tracks the tables.
 
 Next, we want to modify the table we just created, we’re going to remove the author and author email columns from the Books table and replace them with a Foreign Key that points to the author in the new Authors table which we’re also going to be creating. We can put all of these changes into a single file, or we can put them into separate ones which are executed in order according to the numbering system which we use.
 
