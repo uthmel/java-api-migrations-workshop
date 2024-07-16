@@ -43,7 +43,7 @@ Running **flyway —version** should show the version of flyway you have just in
 
 ---
 
-In the previous session, you created a database and tables on ElephantSQL which you used TablePlus to connect to (using the connection details from ElephantSQL).
+In the previous session, you created a database and tables on Neon which you used Beeline Studio to connect to (using the connection details from Neon).
 
 Flyway has various places it looks for a config file, which will hold the details of the database connection (in this order):
 
@@ -51,13 +51,44 @@ Flyway has various places it looks for a config file, which will hold the detail
 - `<user-home>/flyway.conf`
 - `<current-dir>/flyway.conf`
 
-If you put flyway.conf into your current directory it is very, very, very important that you **DO NOT** commit this to GitHub, as anyone with access to your repo could then use the credentials to access your Database. There are bots constantly scanning GitHub to steal these sorts of information in order to use them for potentially nefarious purposes.
+If you put `flyway.toml` into your current directory it is very, very, very important that you **DO NOT** commit this to GitHub, as anyone with access to your repo could then use the credentials to access your Database. There are bots constantly scanning GitHub to steal these sorts of information in order to use them for potentially nefarious purposes.
 
 You can use **.gitignore** to exclude this file from Git.
 
 For now, you can use the one in your installation directory/conf and then change it if you need to connect to a different Database (that way it is outside of the Git repository directory).
 
-Open the **flyway.conf** file which is located in the **conf** directory of the installation directory. Most of it is commented out. As you look towards the bottom you will notice that there are options which are limited to the Teams or Enterprise editions only.
+Go to the **conf** directory which is inside **flyway**'s installation directory. Copy the `flyway.toml.example` file and paste a new copy with the updated name of just `flyway.toml`. Open the new file and you should see that some of it is commented out and some has default values.
+
+```toml
+# More information on the parameters can be found here: https://documentation.red-gate.com/flyway/flyway-cli-and-api/configuration/parameters
+
+[environments.sample]
+url = "jdbc:h2:mem:db"
+user = "sample user"
+password = "sample password"
+# jarDirs = ["path/to/java/migrations"]
+# driver =
+# schemas =
+# connectRetries =
+# connectRetriesInterval =
+# initSql =
+# jdbcProperties =
+# resolvers =
+
+[flyway]
+# environment = "sample" # It is recommended to configure environment as a commandline argument. This allows using different environments depending on the caller.
+# locations = ["filesystem:path/to/sql/files"]
+
+# [environments.build]
+# url = "jdbc:sqlite::memory:"
+# user = "buildUser"
+# password = "buildPassword"
+
+# [flyway.check]
+# buildEnvironment = "build"
+```
+
+We need to make changes to the top part where it details, the connection details and then uncomment the part where the connection details are referenced.
 
 Scroll down to the line that reads **flyway.locations=filesystem:sql*** and remove the part after the = sign. Change it so that it reads **flyway.locations=db/migrations** to make flyway read the current directory (where it is being run from) looking for a directory called **db** containing another one called **migrations** which will contain our database migration files.
 
