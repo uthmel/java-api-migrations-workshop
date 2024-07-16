@@ -183,10 +183,10 @@ Add a file called **V2_0_0__create_authors_table.sql** and add a create table st
 
 ```sql
  CREATE TABLE IF NOT EXISTS Authors (
-    id serial PRIMARY KEY,
-    name VARCHAR(255),
-    email VARCHAR(255)
-)
+    id SERIAL PRIMARY KEY,
+    name TEXT,
+    email TEXT
+);
 ```
 
 Which will create the new table. Then add another file called **V2_1_0__remove_author_details_from_books.sql** with the following SQL inside it.
@@ -205,7 +205,7 @@ Add yet another file called **V2_2_0__add_foreign_key_for_authors_to_books.sql**
 
 ```sql
 ALTER TABLE Books
-ADD COLUMN author_id int;
+ADD COLUMN author_id INT;
 
 ALTER TABLE Books
 ADD CONSTRAINT fk_author_id FOREIGN KEY (author_id) REFERENCES Authors (id);
@@ -251,10 +251,10 @@ Try and work through these steps to create files with Version numbers V3_0_0…,
 
 ```sql
 CREATE TABLE IF NOT EXISTS Publishers (
-    id serial PRIMARY KEY,
-    name VARCHAR(255),
-    location VARCHAR(255)
-)
+    id SERIAL PRIMARY KEY,
+    name TEXT,
+    location TEXT
+);
 ```
 
 **V3_1_0__remove_publisher_details_from_books.sql**
@@ -269,7 +269,7 @@ DROP COLUMN publisher_location;
 
 ```sql
 ALTER TABLE Books
-ADD COLUMN publisher_id int;
+ADD COLUMN publisher_id INT;
 
 ALTER TABLE Books
 ADD CONSTRAINT fk_publisher_id FOREIGN KEY (publisher_id) REFERENCES Publishers (id);
